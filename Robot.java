@@ -36,11 +36,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   WPI_TalonFX _frontLeftMotor = new WPI_TalonFX(3);
-  WPI_TalonFX _frontRightMotor = new WPI_TalonFX(4);
-  WPI_VictorSPX intake = new WPI_VictorSPX(10);
+  WPI_TalonFX _frontRightMotor = new WPI_TalonFX(1);
+  WPI_TalonFX _backLeftMotor = new WPI_TalonFX(4);
+  WPI_TalonFX _backRightMotor = new WPI_TalonFX(2);
+  //WPI_VictorSPX intake = new WPI_VictorSPX(10);
 
   /* Construct drivetrain by providing master motor controllers */
-	DifferentialDrive _drive = new DifferentialDrive(_frontLeftMotor, _frontRightMotor);
+  DifferentialDrive _drive = new DifferentialDrive(_frontLeftMotor, _frontRightMotor);
+  
 
   /* Joystick for control */
 Joystick _joy = new Joystick(0);
@@ -64,12 +67,19 @@ Compressor c = new Compressor(0);
     SmartDashboard.putData("Auto choices", m_chooser);
     _frontLeftMotor.configFactoryDefault();
     _frontRightMotor.configFactoryDefault();
-    intake.configFactoryDefault();
-    _frontLeftMotor.setInverted(true); // <<<<<< Adjust this until robot drives forward when stick is forward
+    _backLeftMotor.configFactoryDefault();
+    _backRightMotor.configFactoryDefault();
+    //intake.configFactoryDefault();
+    _frontLeftMotor.setInverted(false); // <<<<<< Adjust this until robot drives forward when stick is forward
     _frontRightMotor.setInverted(true);
-    intake.setInverted(false);
+    //_backLeftMotor.setInverted(true);
+    //_backRightMotor.setInverted(true);
+    //intake.setInverted(false);
     server = CameraServer.getInstance();
     server.startAutomaticCapture();
+
+    _backLeftMotor.follow(_frontLeftMotor);
+    _backRightMotor.follow(_frontRightMotor);
 
     
   }
@@ -146,7 +156,7 @@ Compressor c = new Compressor(0);
     if(_joy.getRawButton(2)){
       exampleDouble.set(Value.kReverse);
     }
-    intake.set(-_joy.getRawAxis(3)/2);        
+    //intake.set(-_joy.getRawAxis(3)/2);        
 		/**
 		 * Print the joystick values to sign them, comment
 		 * out this line after checking the joystick directions. 
@@ -159,7 +169,7 @@ Compressor c = new Compressor(0);
     _drive.arcadeDrive(forward, turn);
     SmartDashboard.putBoolean("Compressor", enabled);
     SmartDashboard.putBoolean("Compressor Press", pressureSwitch);
-    SmartDashboard.putNumber("Intake Speed", -_joy.getRawAxis(3)/2);
+    //SmartDashboard.putNumber("Intake Speed", -_joy.getRawAxis(3)/2);
     SmartDashboard.putNumber("FWD Speed", forward);
     SmartDashboard.putNumber("TURN Speed", turn);
     SmartDashboard.updateValues();
