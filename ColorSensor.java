@@ -22,6 +22,7 @@ public class ColorSensor
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     private final ColorMatch m_colorMatcher = new ColorMatch();
+    public boolean colorButtonOn = false;
 
 
     WPI_TalonSRX spinner = new WPI_TalonSRX(10);
@@ -38,9 +39,11 @@ public class ColorSensor
 
     public void periodic() {
         // This method will be called once per scheduler run
-        if(_joy.getRawButton(1)){
+        if(_joy.getRawButton(1) && colorButtonOn == false){
           //turn on the motor
-
+           
+          //change bool to say that color sensore is on
+          colorButtonOn = true;
           //call class to find color
           Color detectedColor = m_colorSensor.getColor();
           ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
@@ -59,10 +62,34 @@ public class ColorSensor
           } else {
             colorString = "Unknown";
           }
+          SmartDashboard.putNumber("Red", detectedColor.red);
+
+          SmartDashboard.putNumber("Green", detectedColor.green);
+
+          SmartDashboard.putNumber("Blue", detectedColor.blue);
+
+          SmartDashboard.putNumber("Confidence", match.confidence);
+
+          SmartDashboard.putString("Detected Color", colorString);
           
+        }
+        //if pressed again turn it off
+        else if(_joy.getRawButton(1) && colorButtonOn == true)
+        {
+           colorButtonOn = false;
         }
     }
 
+    public void init()
+    {
+      m_colorMatcher.addColorMatch(kBlueTarget);
+
+      m_colorMatcher.addColorMatch(kGreenTarget);
+  
+      m_colorMatcher.addColorMatch(kRedTarget);
+  
+      m_colorMatcher.addColorMatch(kYellowTarget); 
+    }
  /**
      * The method GetColor() returns a normalized color value from the sensor and can be
      * useful if outputting the color to an RGB LED or similar. To
